@@ -645,6 +645,7 @@ class Layout {
 					let rect;
 					left = 0;
 					top = 0;
+					bottom = 0;
 					for (var i = 0; i != rects.length; i++) {
 						rect = rects[i];
 						if (rect.width > 0 && (!left || rect.left > left)) {
@@ -653,25 +654,14 @@ class Layout {
 						if (rect.height > 0 && (!top || rect.top > top)) {
 							top = rect.top;
 						}
+						if (rect.height > 0 && (!bottom || rect.bottom > bottom)) {
+							bottom = rect.bottom;
+						}
 					}
 
-					if (left >= end || top >= vEnd) {
-						// The text node overflows the current print page so it needs to be split.
+					if (left >= end || bottom >= vEnd) {
 						range = document.createRange();
-						offset = this.textBreak(node, start, end, vStart, vEnd);
-						if (offset === 0) {
-							// Not even a single character from the text node fits the current print page so the text
-							// node needs to be moved to the next print page.
-							range.setStartBefore(node);
-						} else if (offset) {
-							// Only the text before the offset fits the current print page. The rest needs to be moved
-							// to the next print page.
-							range.setStart(node, offset);
-						} else {
-							// Undefined offset is unexpected because we know that the text node is not empty (not even
-							// blank, because we check node.textContent.trim().length above).
-							range = undefined;
-						}
+						range.selectNode(node);
 						break;
 					}
 				}
